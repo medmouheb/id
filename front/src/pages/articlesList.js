@@ -4,15 +4,17 @@ import axios from "axios"
 import { Loader, Alert, Table, Pagination, ActionIcon, Modal, Group, Button, TextInput, Checkbox } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
-import { IconArrowsMoveVertical, IconBook, IconEdit, IconHeart, IconInfoCircle, IconTrashFilled } from '@tabler/icons-react';
+import { IconArrowsMoveVertical, IconBook, IconEdit, IconFolderPlus, IconHeart, IconInfoCircle, IconTrashFilled } from '@tabler/icons-react';
 import Detail from "./detail";
 import UpdateArticle from "./update";
+import CreateArticle from "./create";
 const ArticlesList = () => {
     const API_BASE_URL = "http://localhost:5000/articles"
     const [activePage, setPage] = useState(1);
     const [opened, { open, close }] = useDisclosure(false);
     const [opened1, { open: open1, close: close1 }] = useDisclosure(false);
     const [opened2, { open: open2, close: close2 }] = useDisclosure(false);
+    const [opened3, { open: open3, close: close3 }] = useDisclosure(false);
 
 
     const [Designation_article_filter, setDesignation_article_filter] = useState("");
@@ -60,54 +62,59 @@ const ArticlesList = () => {
         {ArticlesError.message}
     </Alert>)
 
-    const rows=()=>{
-        return(
+    const rows = () => {
+        return (
             Articles.data.articles
-                        .filter((el) => { return el.Designation_article.includes(Designation_article_filter) })
-                        .filter((el) => { return el.Designation_famille_article.includes(Designation_famille_article_filter) })
-                        .filter((el) => {
-                            if (veille && el.Statut_article == "en_veille") { return true }
-                            else if (cours) { return el.Statut_article == "en_cours" }
-                        })
-                        .filter((el) => {
-                            if (disponible && el.Stock_disponible_quantite > 0) { return true }
-                            else if (horsstock && el.Stock_disponible_quantite == 0) { return true }
-                        })
-                        .sort((a, b) => Number( a[sortBy]) -Number( b[sortBy]))
-                        .map((element, i) => (
-                            <Table.Tr key={i}>
-                                <Table.Td>{element.Code_article}</Table.Td>
-                                <Table.Td>{element.Designation_article}</Table.Td>
-                                <Table.Td>{element.Designation_famille_article}</Table.Td>
-                                <Table.Td>{element.Prix_achat}</Table.Td>
-                                <Table.Td>{element.Prix_vente}</Table.Td>
-                                <Table.Td>{element.Taux_marge}</Table.Td>
-                                <Table.Td>{element.Stock_disponible_quantite}</Table.Td>
-                                <Table.Td>{element.Stock_disponible_valeur}</Table.Td>
-                                <Table.Td>{element.Statut_article}</Table.Td>
-                                <Table.Td>
-                                    <div className="actionGroup">
-                                        <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open() }} size="xl" variant="danger" aria-label="Danger variant">
-                                            <IconBook />
-                                        </ActionIcon>
-                                        <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open1() }} size="xl" variant="danger" aria-label="Danger variant">
-                                            <IconEdit />
-                                        </ActionIcon>
-                                        <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open2() }} size="xl" variant="danger" aria-label="Danger variant">
-                                            <IconTrashFilled />
-                                        </ActionIcon>
-                                    </div>
-                                </Table.Td>
-                            </Table.Tr>
-                        ))
+                .filter((el) => { return el.Designation_article.includes(Designation_article_filter) })
+                .filter((el) => { return el.Designation_famille_article.includes(Designation_famille_article_filter) })
+                .filter((el) => {
+                    if (veille && el.Statut_article == "en_veille") { return true }
+                    else if (cours) { return el.Statut_article == "en_cours" }
+                })
+                .filter((el) => {
+                    if (disponible && el.Stock_disponible_quantite > 0) { return true }
+                    else if (horsstock && el.Stock_disponible_quantite == 0) { return true }
+                })
+                .sort((a, b) => Number(a[sortBy]) - Number(b[sortBy]))
+                .map((element, i) => (
+                    <Table.Tr key={i}>
+                        <Table.Td>{element.Code_article}</Table.Td>
+                        <Table.Td>{element.Designation_article}</Table.Td>
+                        <Table.Td>{element.Designation_famille_article}</Table.Td>
+                        <Table.Td>{element.Prix_achat}</Table.Td>
+                        <Table.Td>{element.Prix_vente}</Table.Td>
+                        <Table.Td>{element.Taux_marge}</Table.Td>
+                        <Table.Td>{element.Stock_disponible_quantite}</Table.Td>
+                        <Table.Td>{element.Stock_disponible_valeur}</Table.Td>
+                        <Table.Td>{element.Statut_article}</Table.Td>
+                        <Table.Td>
+                            <div className="actionGroup">
+                                <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open() }} size="xl" variant="danger" aria-label="Danger variant">
+                                    <IconBook />
+                                </ActionIcon>
+                                <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open1() }} size="xl" variant="danger" aria-label="Danger variant">
+                                    <IconEdit />
+                                </ActionIcon>
+                                <ActionIcon onClick={() => { setSelectedArticleIndex(element.id); open2() }} size="xl" variant="danger" aria-label="Danger variant">
+                                    <IconTrashFilled />
+                                </ActionIcon>
+                            </div>
+                        </Table.Td>
+                    </Table.Tr>
+                ))
         )
     }
 
-    
+
 
 
     return (
         <div className="content">
+            <Group justify="center" >
+                <Button  onClick={open3}>
+                    <IconFolderPlus />  Create
+                </Button>
+            </Group>
 
             <Group justify="space-around" >
                 <TextInput
@@ -140,7 +147,7 @@ const ArticlesList = () => {
                     label="horsstock"
                     onClick={() => { sethorsstock(!horsstock) }}
                 />
-                
+
 
             </Group>
             <Table striped highlightOnHover withTableBorder withColumnBorders>
@@ -149,11 +156,11 @@ const ArticlesList = () => {
                         <Table.Th>Code_article</Table.Th>
                         <Table.Th>Designation_article</Table.Th>
                         <Table.Th>Designation_famille_article</Table.Th>
-                        <Table.Th>Prix_achat <IconArrowsMoveVertical onClick={()=>{setsortBy("Prix_achat")}} />  </Table.Th>
-                        <Table.Th>Prix_vente <IconArrowsMoveVertical onClick={()=>{setsortBy("Prix_vente")}} /> </Table.Th>
-                        <Table.Th>Taux_marge <IconArrowsMoveVertical onClick={()=>{setsortBy("Taux_marge")}} />  </Table.Th>
-                        <Table.Th>Stock_disponible_quantite  <IconArrowsMoveVertical onClick={()=>{setsortBy("Stock_disponible_quantite")}} /> </Table.Th>
-                        <Table.Th>Stock_disponible_valeur <IconArrowsMoveVertical onClick={()=>{setsortBy("Stock_disponible_valeur")}} /> </Table.Th>
+                        <Table.Th>Prix_achat <IconArrowsMoveVertical onClick={() => { setsortBy("Prix_achat") }} />  </Table.Th>
+                        <Table.Th>Prix_vente <IconArrowsMoveVertical onClick={() => { setsortBy("Prix_vente") }} /> </Table.Th>
+                        <Table.Th>Taux_marge <IconArrowsMoveVertical onClick={() => { setsortBy("Taux_marge") }} />  </Table.Th>
+                        <Table.Th>Stock_disponible_quantite  <IconArrowsMoveVertical onClick={() => { setsortBy("Stock_disponible_quantite") }} /> </Table.Th>
+                        <Table.Th>Stock_disponible_valeur <IconArrowsMoveVertical onClick={() => { setsortBy("Stock_disponible_valeur") }} /> </Table.Th>
                         <Table.Th>Statut_article</Table.Th>
                         <Table.Th>Actions</Table.Th>
                     </Table.Tr>
@@ -170,6 +177,10 @@ const ArticlesList = () => {
             </Modal>
             <Modal opened={opened1} onClose={close1} title="update">
                 <UpdateArticle id={selectedArticleIndex} />
+            </Modal>
+
+            <Modal opened={opened3} onClose={close3} title="update">
+                <CreateArticle />
             </Modal>
 
             <Modal opened={opened2} onClose={close2} title="update">

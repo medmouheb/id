@@ -60,6 +60,7 @@ app.post('/articles', (req, res) => {
        ],
        (err, result) => {
           if (err) {
+            console.log("err::",err)
              res.status(500).json({ error: 'Internal Server Error' });
              return;
           }
