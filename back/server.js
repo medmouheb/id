@@ -174,7 +174,22 @@ app.post('/articles', (req, res) => {
  
      const totalItems = countResult[0].totalItems;
  
-     const dataSql = 'SELECT * FROM articles LIMIT ? OFFSET ?';
+     const dataSql = `SELECT
+     F_ARTICLE.AR_Ref AS Code_article,
+     F_ARTICLE.AR_Design AS Designation_article,
+     F_DOCLIGNE.DL_Design AS Designation_famille_article,
+     F_ARTICLE.AR_PrixAch AS Prix_achat,
+     F_ARTICLE.AR_PrixVen AS Prix_vente,
+     (F_ARTICLE.AR_PrixVen - F_ARTICLE.AR_PrixAch) AS Taux_marge,
+     F_ARTSTOCK.AS_QteSto AS Stock_disponible_quantite,
+     F_ARTSTOCK.AS_MontSto AS Stock_disponible_valeur,
+     F_ARTICLE.AR_Transfere AS Statut_article
+   FROM
+     F_ARTICLE
+   LEFT JOIN F_ARTSTOCK ON F_ARTICLE.AR_Ref = F_ARTSTOCK.AR_Ref
+   LEFT JOIN F_DOCLIGNE ON F_ARTICLE.AR_Ref = F_DOCLIGNE.AR_Ref
+   LIMIT ? OFFSET ?
+   ;`;
      db.query(dataSql, [pageSize, offset], (dataErr, dataResult) => {
        if (dataErr) {
          res.status(500).json({ error: 'Internal Server Error' });
